@@ -1,0 +1,27 @@
+version: '3.9'                              #Version des Formats für docker-compose Datei. 
+services:
+  db:
+    image: mysql:latest                     #Image
+    environment:
+      MYSQL_ROOT_PASSWORD: password         #Datenbank Passwort
+      MYSQL_DATABASE: mysql                 #Datenbank Name
+    volumes:
+      - db_data:/var/lib/mysql              #Volumenname, Datenbank Pfad im Container
+  backend:
+    build:                                  #Image und Konfiguration sind im Dockerfile hinterlegt 
+      context: backend                      #Pfad des backends. 
+      dockerfile: Dockerfile                #Name des Dockerfiles
+    ports:
+      - "8080:8080"                         #Portzuweisung Hostmaschine:Container
+    depends_on:
+      - db                                  #Startet zuvor db
+  frontend:
+    image: nginx:latest                     #Image
+    ports:
+      - "80:80"                             #Portzuweisung Hostmaschine:Container
+    volumes:
+      - ./frontend:/usr/share/nginx/html    #Pfad Hostmaschine: Pfad Container
+    depends_on:
+      - backend                             #Startet zuvor backend
+volumes:
+  db_data:                                  #Volumen auf Hostmaschine für mysql Datenbank
